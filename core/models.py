@@ -23,5 +23,8 @@ class Post(models.Model):
     likes = models.ManyToManyField(User, through="PostLike")
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    class Meta: 
+        ordering = ['-id']
+
     def __str__(self):
-        return self.description
+        return '{}'.format(self.description)

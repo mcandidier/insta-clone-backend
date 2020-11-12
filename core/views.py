@@ -12,27 +12,30 @@ from rest_framework import status
 from .serializers import PostSerializer
 from .models import Post
 
+from django.contrib.auth.models import User
 
 class PostPermissions:
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
 
-class PostViewSet(viewsets.ViewSet, PostPermissions):
+class PostViewSet(viewsets.ViewSet):
     """ post viewsets 
     """
     serializer_class = PostSerializer
     parser_class = (FileUploadParser,)
 
     def get_posts(self, *args, **kwargs):
+        user = User.objects.first()
         qs = Post.objects.all()
-        serializer = self.serializer_class(qs, many=True)
+        serializer = self.serializer_class(qs,  user=user, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create_post(self, *args, **kwargs):
         serializer = self.serializer_class(data=self.request.data)
         if serializer.is_valid():
-            serializer.save(user=self.request.user)
+            #FORCE to select first user since we don't have authentication on frontend
+            serializer.save(user=User.objects.first())
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -52,18 +55,20 @@ class PostDetailViewset(viewsets.ViewSet, PostPermissions):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
     def set_action(self, *args, **kwargs):
+        user = User.objects.first()
         try:
             obj = Post.objects.get(id=kwargs.get('id'))
             action = self.request.data.get('action')
             if action == 'like':
-                obj.likes.add(self.request.user)
+                obj.likes.add(user) #to be remove
+                # obj.likes.add(self.request.user)
             elif action == 'unlike':
-                obj.likes.remove(self.request.user)
+                # obj.likes.remove(self.request.user)
+                obj.likes.remove(user)
             elif action == 'archive':
-                print('archive')
                 obj.is_archived = True
             obj.save()
-            serializer = self.serializer_class(obj)
+            serializer = self.serializer_class(obj, user=user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Post.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
