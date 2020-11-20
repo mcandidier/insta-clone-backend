@@ -12,7 +12,7 @@ from rest_framework import status
 from .serializers import PostSerializer
 from .models import Post
 
-from django.contrib.auth.models import User
+from account.models import User
 
 class PostPermissions:
     authentication_classes = [SessionAuthentication, BasicAuthentication]

@@ -7,6 +7,13 @@ from rest_framework.authtoken.models import Token
 
 from .models import User
 
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['email', 'first_name', 'last_name', 'username']
+
+
 class UserRegistrationSerializer(serializers.Serializer):
     """ User Registration using email
     """
@@ -20,6 +27,7 @@ class UserRegistrationSerializer(serializers.Serializer):
             username=validated_data['email'],
         )
         user.set_password(validated_data['password'])
+        user.is_active = True
         user.save()
         return user
 

@@ -2,13 +2,18 @@ from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import TemplateView
 
-from rest_framework.viewsets import ViewSet
+from rest_framework.viewsets import ViewSet, ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from .serializers import UserRegistrationSerializer, UserLoginSerializer
+from .serializers import (
+    UserRegistrationSerializer,
+    UserLoginSerializer,
+    UserSerializer
+)
 
+from .models import User
 
 class UserLoginView(APIView):
     """ User login API view
@@ -41,17 +46,12 @@ class UserRegisterView(APIView):
         return Response(serializer.errors, status=400)
         
 
-class UserViewSet(ViewSet):
+class UserViewSet(APIView):
     """ Authenticated user views
     """ 
-    permission_classes = (IsAuthenticated,)
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
 
-    def user_info(self, *args, **kwargs):
-        pass
-
-    def user_logout(self, *args, **kwargs):
-        pass
-
-
-    def user_update(self, *args, **kwargs):
-        pass
+    def get(self, *args, **kwargs):
+        serializer = self.serializer_class(self.request.user)
+        return Response(serializer.data, status=200)
