@@ -27,7 +27,7 @@ class PostViewSet(PostPermissions, viewsets.ViewSet):
 
     def get_posts(self, *args, **kwargs):
         qs = Post.objects.filter(user=self.request.user)
-        serializer = self.serializer_class(qs, many=True)
+        serializer = self.serializer_class(qs, user=self.request.user,  many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create_post(self, *args, **kwargs):
