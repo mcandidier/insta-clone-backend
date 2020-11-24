@@ -7,6 +7,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
+from rest_framework.parsers import FileUploadParser
+
 from .serializers import (
     UserRegistrationSerializer,
     UserLoginSerializer,
@@ -54,4 +56,22 @@ class UserViewSet(APIView):
 
     def get(self, *args, **kwargs):
         serializer = self.serializer_class(self.request.user)
+        return Response(serializer.data, status=200)
+
+
+class UserProfileView(APIView):
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
+    parser_class = (FileUploadParser,)
+
+    def post(self, *args, **kwargs):
+        data = self.request.data
+        
+        user = self.request.user
+        action = data.get('action')
+        if action == 'update_photo':
+            user.profile_photo = self.request.FILES.get('profile_photo')
+        user.save()
+        serializer = self.serializer_class(user)
         return Response(serializer.data, status=200)

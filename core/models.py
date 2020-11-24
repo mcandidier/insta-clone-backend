@@ -22,7 +22,6 @@ class Post(models.Model):
     is_archived = models.BooleanField(default=False)
     likes = models.ManyToManyField(User, through="PostLike")
     timestamp = models.DateTimeField(auto_now_add=True)
-
     class Meta: 
         ordering = ['-id']
 

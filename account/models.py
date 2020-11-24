@@ -43,6 +43,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(unique=True, max_length=128)
     first_name = models.CharField(null=True, blank=True, max_length=128)
     last_name = models.CharField(null=True, blank=True, max_length=128)
+    profile_photo = models.ImageField(upload_to='profiles/', null=True, blank=True)
 
     date_joined = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
