@@ -6,12 +6,29 @@ from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
 from .models import User
+from core.models import Following
 
+class FollowingSerializer(serializers.ModelSerializer):
+    """ User Following
+    """
+    class Meta:
+        model = Following
+        fields = '__all__'
 
 class UserSerializer(serializers.ModelSerializer):
+
+    followers = serializers.SerializerMethodField(read_only=True)
+    following = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = User
-        fields = ['id', 'email', 'first_name', 'last_name', 'username', 'profile_photo', 'bio']
+        fields = ['id', 'email', 'first_name', 'last_name', 'username', 'profile_photo', 'bio', 'followers', 'following']
+
+    def get_followers(self, obj):
+        return obj.followers.all().count()
+
+    def get_following(self, obj):
+        return obj.following.all().count()
 
 
 class UserRegistrationSerializer(serializers.Serializer):

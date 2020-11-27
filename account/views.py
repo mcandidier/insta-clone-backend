@@ -67,7 +67,6 @@ class UserProfileView(APIView):
 
     def post(self, *args, **kwargs):
         data = self.request.data
-        
         user = self.request.user
         action = data.get('action')
         if action == 'update_photo':

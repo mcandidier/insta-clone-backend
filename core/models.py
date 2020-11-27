@@ -1,8 +1,13 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 
-from django.conf import settings
+User = get_user_model()
 
-User = settings.AUTH_USER_MODEL
+class Following(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')
+    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followers')
+    timestamp = models.DateTimeField(auto_now_add=True)
+
 
 class PostLike(models.Model):
     """ Post Like model
@@ -10,7 +15,6 @@ class PostLike(models.Model):
     post = models.ForeignKey("Post", on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name='likes', on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
-
 
 class Post(models.Model):
     """ Post model

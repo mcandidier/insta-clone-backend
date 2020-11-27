@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 
 from .serializers import PostSerializer
-from .models import Post
+from .models import Post, Following
 
 from account.models import User
 
@@ -67,3 +67,12 @@ class PostDetailViewset(PostPermissions, viewsets.ViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Post.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+class FollowingView(APIView):
+    def post(self, *args, **kwargs):
+        user_to_follow = self.request.data.get('user_to_follow')
+        Following.objects.create(
+            user=self.request.user,
+            follower_id=user_to_follow
+        )
+        return Response({}, status=200)
