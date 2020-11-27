@@ -3,6 +3,14 @@ from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.utils.translation import ugettext_lazy as _
 
+PUBLIC = 0
+PRIVATE = 1
+
+PRIVACY_CHOICES = (
+    (PUBLIC, 'Public'),
+    (PRIVATE, 'Private')
+)
+
 class CustomUserManager(BaseUserManager):
     """ Custom user manager
     """
@@ -48,6 +56,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     bio = models.TextField(null=True, blank=True)
+    privacy = models.CharField(max_length=1, choices=PRIVACY_CHOICES, default=PUBLIC)
+
 
     is_staff = models.BooleanField(
         _('staff status'),
