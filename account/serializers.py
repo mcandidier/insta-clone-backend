@@ -105,12 +105,12 @@ class ChangePasswordSerializer(serializers.Serializer):
         try:
             validators.validate_password(value)
         except exceptions.ValidationError as exc:
-            raise serializers.ValidationError(str(exc))
+            errors = list(exc)
+            raise serializers.ValidationError(errors)
         return value
 
-    def validate(self, data):
-        password = data.get('password')
-        confirm_password = data.get('confirm_password')
-        if password != confirm_password:
+    def validate_confirm_password(self, value):
+        password = self.get_initial().get('password')
+        if value != password: 
             raise serializers.ValidationError("Passwords don't match")
-        return data
+        return value
