@@ -1,12 +1,16 @@
 from django.conf import settings
 from django.contrib.auth import authenticate
+import django.contrib.auth.password_validation as validators
 from django.utils.translation import ugettext_lazy as _
+from django.core import exceptions
+
 
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
 from .models import User
 from core.models import Following
+
 
 class FollowingSerializer(serializers.ModelSerializer):
     """ User Following
@@ -23,6 +27,8 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'first_name', 'last_name', 'username', 'profile_photo', 'bio', 'followers', 'following']
+        # extra_kwargs = {'username': {'required': False}} 
+
 
     def get_followers(self, obj):
         return obj.followers.all().count()
@@ -88,3 +94,23 @@ class UserLoginSerializer(serializers.Serializer):
         token = Token.objects.create(user=user)
         self.token = token.key
         return token
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+
+    password = serializers.CharField(required=True)
+    confirm_password = serializers.CharField(required=True)
+
+    def validate_password(self, value):
+        try:
+            validators.validate_password(value)
+        except exceptions.ValidationError as exc:
+            raise serializers.ValidationError(str(exc))
+        return value
+
+    def validate(self, data):
+        password = data.get('password')
+        confirm_password = data.get('confirm_password')
+        if password != confirm_password:
+            raise serializers.ValidationError("Passwords don't match")
+        return data

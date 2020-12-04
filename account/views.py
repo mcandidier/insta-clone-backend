@@ -12,7 +12,8 @@ from rest_framework.parsers import FileUploadParser
 from .serializers import (
     UserRegistrationSerializer,
     UserLoginSerializer,
-    UserSerializer
+    UserSerializer,
+    ChangePasswordSerializer
 )
 
 from .models import User
@@ -46,7 +47,20 @@ class UserRegisterView(APIView):
             serializer.save()
             return Response({}, status=200)
         return Response(serializer.errors, status=400)
-        
+
+class UserChangePasswordView(APIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ChangePasswordSerializer
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        serializer = self.serializer_class(data=self.request.data)
+        if serializer.is_valid():
+            password = serializer.data.get('password')
+            user.set_password(password)
+            return Response({'message': 'password updated successfully.'}, status=200)
+        return Response(serializer.errors, status=400)
+
 
 class UserViewSet(APIView):
     """ Authenticated user views
@@ -65,12 +79,20 @@ class UserProfileView(APIView):
     serializer_class = UserSerializer
     parser_class = (FileUploadParser,)
 
-    def post(self, *args, **kwargs):
-        data = self.request.data
-        user = self.request.user
-        action = data.get('action')
-        if action == 'update_photo':
-            user.profile_photo = self.request.FILES.get('profile_photo')
-        user.save()
-        serializer = self.serializer_class(user)
+    def post(self, request, *args, **kwargs):
+        if request.FILES.get('profile_photo'):
+            request.user.profile_photo = request.FILES.get('profile_photo')
+            request.user.save()
+            return Response({'profile_photo': request.user.profile_photo.url}, status=200)
+        return Response(status=400)
+
+    def put(self, request, *args, **kwargs):
+        serializer = self.serializer_class(request.user, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        serializer = self.serializer_class(request.user)
         return Response(serializer.data, status=200)
+
+    def delete(self, request, *args, **kwargs):
+        request.user.profile_photo.delete()
+        return Response(status=204)
