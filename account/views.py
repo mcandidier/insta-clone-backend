@@ -17,6 +17,8 @@ from .serializers import (
 )
 
 from .models import User
+from core.models import Post
+from core.serializers import PostSerializer
 
 class UserLoginView(APIView):
     """ User login API view
@@ -80,7 +82,9 @@ class UserProfileView(APIView):
     serializer_class = UserSerializer
     parser_class = (FileUploadParser,)
 
+
     def post(self, request, *args, **kwargs):
+        # upload user profile photo
         if request.FILES.get('profile_photo'):
             request.user.profile_photo = request.FILES.get('profile_photo')
             request.user.save()
@@ -97,3 +101,31 @@ class UserProfileView(APIView):
     def delete(self, request, *args, **kwargs):
         request.user.profile_photo.delete()
         return Response(status=204)
+
+
+class ProfileView(APIView):
+    """ Profile View
+        lookup username
+    """
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
+
+    def get(self, *args, **kwargs):
+        username = kwargs.get('username')
+        try:
+            user = User.objects.get(username=username)
+            serializer = self.serializer_class(user)
+            return Response(serializer.data, status=200)
+        except User.DoesNotExist:
+            return Response({}, status=404)
+
+
+class ProfilePostView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PostSerializer
+
+    def get(self, request, *args, **kwargs):
+        username = kwargs.get('username', '')
+        queryset = Post.objects.filter(user__username=username)
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data, status=200)

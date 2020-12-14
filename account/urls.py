@@ -6,6 +6,8 @@ from .views import (
     UserLoginView,
     UserViewSet,
     UserProfileView,
+    ProfileView,
+    ProfilePostView,
     UserChangePasswordView
 )
 
@@ -17,6 +19,7 @@ urlpatterns = [
     path('current/', UserViewSet.as_view()), #todo: move to profile
     path('change-password/', UserChangePasswordView.as_view(), name='change_password'),
     path('profile/', UserProfileView.as_view(), name='profile'),
+    path('<str:username>/', ProfileView.as_view(), name='profile_view'),
+    path('<str:username>/posts/', ProfilePostView.as_view(), name='profile_view'),
     path('followers/', FollowingView.as_view(), name='followers')
 ]
-
