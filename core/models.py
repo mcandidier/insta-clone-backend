@@ -8,6 +8,10 @@ class Following(models.Model):
     follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followers')
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user','follower'],  name="unique_followers")
+        ]
 
 class PostLike(models.Model):
     """ Post Like model
@@ -19,7 +23,6 @@ class PostLike(models.Model):
 class Post(models.Model):
     """ Post model
     """
-
     user =  models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
     description = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to='images/')

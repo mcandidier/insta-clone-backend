@@ -11,8 +11,6 @@ from .views import (
     UserChangePasswordView
 )
 
-from core.views import FollowingView
-
 urlpatterns = [
     path('login/', UserLoginView.as_view(), name='login'),
     path('register/', UserRegisterView.as_view(), name='register'),
@@ -20,6 +18,10 @@ urlpatterns = [
     path('change-password/', UserChangePasswordView.as_view(), name='change_password'),
     path('profile/', UserProfileView.as_view(), name='profile'),
     path('<str:username>/', ProfileView.as_view(), name='profile_view'),
-    path('<str:username>/posts/', ProfilePostView.as_view(), name='profile_view'),
-    path('followers/', FollowingView.as_view(), name='followers')
+    path('<str:username>/posts/', ProfilePostView.as_view(), name='profile'),
+    path('<str:username>/followers/', ProfileView.as_view(), name='profile_view'),
+    path('<str:username>/following/', ProfileView.as_view(), name='profile_view'),
+
 ]
+
+

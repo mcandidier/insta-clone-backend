@@ -17,8 +17,9 @@ from .serializers import (
 )
 
 from .models import User
-from core.models import Post
+from core.models import Post, Following
 from core.serializers import PostSerializer
+
 
 class UserLoginView(APIView):
     """ User login API view
@@ -118,6 +119,19 @@ class ProfileView(APIView):
             return Response(serializer.data, status=200)
         except User.DoesNotExist:
             return Response({}, status=404)
+
+    def post(self, *args, **kwargs):
+        # follow user 
+        # lookup : username
+        user_to_follow = User.objects.filter(username=kwargs.get('username'))
+        if user_to_follow.exists():
+            user = user_to_follow.first()
+            Following.objects.create(
+                user=self.request.user,
+                follower=user
+            )
+            return Response({'id': user.id}, status=200)
+        return Response({'msg': 'User does not exists'}, status=400)
 
 
 class ProfilePostView(APIView):
