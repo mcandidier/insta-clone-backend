@@ -123,13 +123,18 @@ class ProfileView(APIView):
     def post(self, *args, **kwargs):
         # follow user 
         # lookup : username
-        user_to_follow = User.objects.filter(username=kwargs.get('username'))
+        action = self.request.data.get('action')
+        username = kwargs.get('username')
+        user_to_follow = User.objects.filter(username=username)
         if user_to_follow.exists():
             user = user_to_follow.first()
-            Following.objects.create(
-                user=self.request.user,
-                follower=user
-            )
+            if action == 'follow':
+                Following.objects.create(
+                    user=self.request.user,
+                    follower=user
+                )
+            else:
+                Following.objects.filter(follower__username=username).delete()
             return Response({'id': user.id}, status=200)
         return Response({'msg': 'User does not exists'}, status=400)
 
