@@ -47,7 +47,7 @@ class PostDetailViewset(PostPermissions, viewsets.ViewSet):
     def get_detail(self, *args, **kwargs):
         try:
             obj = Post.objects.get(id=kwargs.get('id'))
-            serializer = self.serializer_class(obj)
+            serializer = self.serializer_class(obj, user=self.request.user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Post.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
