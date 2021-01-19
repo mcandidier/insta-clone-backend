@@ -34,3 +34,16 @@ class Post(models.Model):
 
     def __str__(self):
         return '{}'.format(self.description)
+
+
+class Comment(models.Model):
+    user =  models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
+    post = models.ForeignKey("Post", on_delete=models.CASCADE)
+    text = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    class Meta:
+        ordering = ['-id']
+
+    def __str__(self):
+        return '{}'.format(self.text)
