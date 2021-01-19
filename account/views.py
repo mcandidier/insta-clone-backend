@@ -145,6 +145,7 @@ class ProfilePostView(APIView):
 
     def get(self, request, *args, **kwargs):
         username = kwargs.get('username', '')
-        queryset = Post.objects.filter(user__username=username)
-        serializer = self.serializer_class(queryset, many=True)
+        user = User.objects.filter(username=username).first()
+        queryset = Post.objects.filter(user=user)
+        serializer = self.serializer_class(queryset, many=True, user=user)
         return Response(serializer.data, status=200)
