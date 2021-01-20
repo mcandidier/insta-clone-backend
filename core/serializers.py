@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from account.serializers import UserSerializer
-from .models import Post
+from .models import Post, Comment
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -23,3 +23,12 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_like_count(self, obj):
         return obj.likes.all().count()
+
+
+class CommentSerializer(serializers.ModelSerializer):
+
+    class Meta: 
+        model = Comment
+        fields = '__all__'
+        read_only_fields = ['post', 'user']
+

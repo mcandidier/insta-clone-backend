@@ -1,5 +1,6 @@
 from django.shortcuts import render
 
+from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
@@ -9,8 +10,8 @@ from rest_framework.views import APIView
 
 from rest_framework import status
 
-from .serializers import PostSerializer
-from .models import Post, Following
+from .serializers import PostSerializer, CommentSerializer
+from .models import Post, Following, Comment
 
 from account.models import User
 
@@ -67,3 +68,23 @@ class PostDetailViewset(PostPermissions, viewsets.ViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Post.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class CommentViewSet(APIView):
+
+    serializer_class = CommentSerializer
+
+    def get(self, *args, **kwargs):
+        comments = Comment.objects.filter(post__id=kwargs.get('post_id'))
+        serializer = self.serializer_class(comments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def post(self, *args, **kwargs):
+        # Add comment to a post
+        post_obj = Post.objects.filter(id=kwargs.get('post_id')).first()
+        serializer = self.serializer_class(data=self.request.data)
+        if serializer.is_valid():
+            serializer.save(user=self.request.user, post=post_obj)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
