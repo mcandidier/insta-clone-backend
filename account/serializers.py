@@ -61,6 +61,12 @@ class UserRegistrationSerializer(serializers.Serializer):
             raise serializers.ValidationError("User already exist")
         return value
 
+    def validate_username(self, value):
+        users = User.objects.filter(username=value)
+        if users.exists():
+            raise serializers.ValidationError("User already exist using that username")
+        return value
+
     def validate(self, data):
         if data.get('password') != data.get('confirm_password'):
             raise serializers.ValidationError("Passwords don't match.")
