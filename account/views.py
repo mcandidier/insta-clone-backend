@@ -15,10 +15,11 @@ from .serializers import (
     UserRegistrationSerializer,
     UserLoginSerializer,
     UserSerializer,
-    ChangePasswordSerializer
+    ChangePasswordSerializer,
+    ResetPasswordSerializer
 )
 
-from .models import User
+from .models import User, ResetPassword
 from core.models import Post, Following
 from core.serializers import PostSerializer
 
@@ -151,3 +152,29 @@ class ProfilePostView(APIView):
         queryset = Post.objects.filter(user=user)
         serializer = self.serializer_class(queryset, many=True, user=user)
         return Response(serializer.data, status=200)
+
+
+class ResetPasswordView(APIView):
+    """ Reset user password view
+    """
+    permission_classes = [AllowAny]
+    serializer_class = ResetPasswordSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=200)
+
+class ResetPasswordChangeView(APIView):
+    serializer_class = ChangePasswordSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        user = ResetPassword.objects.filter(token=kwargs.get('token')).first()
+        user = User.objects.filter(email=user.email).first()
+        if serializer.is_valid():
+            password = serializer.data.get('password')
+            user.set_password(password)
+            return Response({'msg': 'Password has been updated.'}, status=200)
+        return Response(serializer.errors, status=400)

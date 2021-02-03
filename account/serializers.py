@@ -8,7 +8,7 @@ from django.core import exceptions
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
-from .models import User
+from .models import User, ResetPassword
 from core.models import Following
 
 
@@ -118,5 +118,17 @@ class ChangePasswordSerializer(serializers.Serializer):
     def validate_confirm_password(self, value):
         password = self.get_initial().get('password')
         if value != password: 
-            raise serializers.ValidationError("Passwords don't match")
+            raise serializers.ValidationError("Passwords didn't match")
+        return value
+
+
+class ResetPasswordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ResetPassword
+        fields = ('email',)
+
+    def validate_email(self, value):
+        qs = User.objects.filter(email=value)
+        if not qs.exists():
+            raise serializers.ValidationError("The Email address doesn't match any account.")
         return value

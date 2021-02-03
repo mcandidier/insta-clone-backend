@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from .forms import CustomUserCreationForm, CustomUserChangeForm
-from .models import User
+from .models import User, ResetPassword
 
 
 class UserAdmin(UserAdmin):
@@ -29,4 +29,9 @@ class UserAdmin(UserAdmin):
     ordering = ('email',)
 
 
+class ResetPasswordAdmin(admin.ModelAdmin):
+    list_display = ['email', 'token', 'date_created']
+    # readonly_fields = ['token', 'date_created']
+
 admin.site.register(User, UserAdmin)
+admin.site.register(ResetPassword, ResetPasswordAdmin)
