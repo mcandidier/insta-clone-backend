@@ -1,5 +1,7 @@
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from django.conf.urls import url
+from django.urls import include
+from rest_framework import routers
 
 from .views import (
     UserRegisterView,

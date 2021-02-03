@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import TemplateView
+from django.contrib.auth import views as auth_views
+
 
 from rest_framework.viewsets import ViewSet, ModelViewSet
 from rest_framework.views import APIView

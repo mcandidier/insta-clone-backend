@@ -37,8 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-
     'corsheaders',
+    'anymail',
+
     'core.apps.CoreConfig',
     'account.apps.AccountConfig',
 ]
@@ -137,7 +138,6 @@ MEDIA_URL =  '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # whitelist localhost:3000 to served our frontend
-
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
