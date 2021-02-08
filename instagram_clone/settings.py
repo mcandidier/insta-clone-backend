@@ -143,3 +143,18 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 AUTH_USER_MODEL = 'account.User'
+
+###### ANYMAIL CONFIG ####
+ANYMAIL = {
+    "SENDINBLUE_API_KEY": "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",
+}
+
+EMAIL_BACKEND = "anymail.backends.sendinblue.EmailBackend"
+
+
+BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Singapore'

@@ -82,12 +82,18 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f'{self.email}'
 
+
 class ResetPassword(models.Model):
     """ Reset password for user
     """ 
     email = models.EmailField()
     date_created = models.DateTimeField(auto_now_add=True)
     token = models.UUIDField(default=uuid.uuid4, editable=False)
+    is_used = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.email}'
+
+
+    def is_expired(self):
+        pass

@@ -10,6 +10,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from rest_framework.parsers import FileUploadParser
+from .models import ResetPassword
+
+from .tasks import send_feedback_email_task
 
 from .serializers import (
     UserRegistrationSerializer,
@@ -55,11 +58,15 @@ class UserRegisterView(APIView):
         return Response(serializer.errors, status=400)
 
 class UserChangePasswordView(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     serializer_class = ChangePasswordSerializer
 
     def post(self, request, *args, **kwargs):
-        user = self.request.user
+        token = request.data.get('token', None)
+        user = request.user
+        if token:
+            token = get_object_or_404(ResetPassword, token=token)
+            user = User.objects.filter(email=token.email).first()
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             password = serializer.data.get('password')
@@ -163,7 +170,8 @@ class ResetPasswordView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        reset = serializer.save()
+        send_feedback_email_task.delay(reset.email, reset.token)
         return Response(serializer.data, status=200)
 
 class ResetPasswordChangeView(APIView):
