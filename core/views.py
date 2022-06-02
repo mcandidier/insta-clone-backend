@@ -28,7 +28,11 @@ class PostViewSet(PostPermissions, viewsets.ViewSet):
 
     def get_posts(self, *args, **kwargs):
         qs = Post.objects.filter(user=self.request.user)
-        serializer = self.serializer_class(qs, user=self.request.user,  many=True)
+        following_ids = self.request.user.following.all().values_list('follower__id')
+        follow = Post.objects.filter(user__in=following_ids)
+        posts = qs | follow
+        recent_posts = posts.distinct().order_by('-timestamp')
+        serializer = self.serializer_class(recent_posts, user=self.request.user,  many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create_post(self, *args, **kwargs):
