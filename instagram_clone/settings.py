@@ -139,10 +139,7 @@ MEDIA_URL =  '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # whitelist localhost:3000 to served our frontend
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "d3gyie7zzrjugl.amplifyapp.com"
-]
+CORS_ALLOWED_ORIGINS = ['*']
 
 AUTH_USER_MODEL = 'account.User'
 
