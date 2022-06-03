@@ -139,7 +139,8 @@ MEDIA_URL =  '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # whitelist localhost:3000 to served our frontend
-CORS_ALLOWED_ORIGINS = ['*']
+CORS_ALLOW_ALL_ORIGINS = True 
+# CORS_ALLOWED_ORIGINS = ['*']
 
 AUTH_USER_MODEL = 'account.User'
 
